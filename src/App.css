@@ -1,30 +1,55 @@
-:root {
+/* ==================== 1. 피자 모드 변신 스위처 (좌측 하단 고정) ==================== */
+.mode-switcher-fixed {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 999;
+}
+
+.mode-toggle-btn {
+  background: #ffc000;
+  color: #1a0f08;
+  border: 3px solid #1a0f08;
+  border-radius: 99px;
+  padding: 12px 22px;
+  font-weight: 900;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #1a0f08;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mode-toggle-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 6px 6px 0 #1a0f08;
+}
+
+.mode-toggle-btn:active {
+  transform: translateY(2px);
+  box-shadow: 1px 1px 0 #1a0f08;
+}
+
+/* ==================== 2. 방명록 기본 모드 변수 & 스타일 ==================== */
+.mode-feed {
   --bg-app: #fafafa;
   --text-main: #0f172a;
   --text-sub: #64748b;
   --line-color: #f1f5f9;
-  --accent-primary: #0f172a;
   --card-bg: #ffffff;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  min-height: 100vh;
 }
 
-[data-theme='dark'] {
+[data-theme='dark'] .mode-feed {
   --bg-app: #090d16;
   --text-main: #f8fafc;
   --text-sub: #94a3b8;
   --line-color: #1e293b;
-  --accent-primary: #f8fafc;
   --card-bg: #111827;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: var(--bg-app);
-  color: var(--text-main);
-}
-
-* {
-  box-sizing: border-box;
 }
 
 .stream-app {
@@ -67,7 +92,6 @@ body {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
 }
 
 .theme-btn {
@@ -79,7 +103,7 @@ body {
   cursor: pointer;
 }
 
-/* Container */
+/* Feed Container */
 .feed-container {
   max-width: 600px;
   margin: 0 auto;
@@ -89,14 +113,12 @@ body {
   gap: 20px;
 }
 
-/* Summary Bar */
 .summary-bar {
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 0.85rem;
   color: var(--text-sub);
-  padding: 4px 0;
 }
 
 .stat-inline {
@@ -110,11 +132,6 @@ body {
   color: var(--text-main);
 }
 
-.divider {
-  opacity: 0.3;
-}
-
-/* Filter Row */
 .filter-row {
   display: flex;
   justify-content: space-between;
@@ -127,10 +144,6 @@ body {
   align-items: center;
   gap: 8px;
   flex: 1;
-}
-
-.s-icon {
-  color: var(--text-sub);
 }
 
 .minimal-search input {
@@ -154,17 +167,14 @@ body {
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0;
 }
 
 .tab-item.active {
   color: var(--text-main);
   font-weight: 800;
   text-decoration: underline;
-  text-underline-offset: 4px;
 }
 
-/* Timeline Feed */
 .timeline {
   display: flex;
   flex-direction: column;
@@ -175,14 +185,8 @@ body {
   background: var(--card-bg);
   border-radius: 16px;
   padding: 20px;
-  position: relative;
-  transition: transform 0.15s ease;
   border-left: 4px solid var(--accent-color, #ffb703);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.feed-item:hover {
-  transform: translateY(-2px);
 }
 
 .item-header {
@@ -208,11 +212,6 @@ body {
   font-size: 0.95rem;
 }
 
-.bullet {
-  color: var(--text-sub);
-  font-size: 0.75rem;
-}
-
 .time-ago {
   font-size: 0.8rem;
   color: var(--text-sub);
@@ -223,14 +222,7 @@ body {
   border: none;
   color: var(--text-sub);
   cursor: pointer;
-  font-size: 0.9rem;
   opacity: 0.4;
-  padding: 0;
-}
-
-.icon-del-btn:hover {
-  opacity: 1;
-  color: #ef4444;
 }
 
 .item-body {
@@ -241,11 +233,8 @@ body {
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 
-/* Actions (박스 없이 깔끔한 아이콘 + 숫자 형태) */
 .item-actions {
   display: flex;
   gap: 20px;
@@ -255,7 +244,6 @@ body {
 .action-btn {
   background: none;
   border: none;
-  padding: 0;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -263,18 +251,12 @@ body {
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.15s;
-}
-
-.action-btn:hover {
-  color: var(--text-main);
 }
 
 .action-btn.like.active {
   color: #ef4444;
 }
 
-/* Inline Comments */
 .inline-comments {
   margin-top: 16px;
   padding-top: 14px;
@@ -293,30 +275,16 @@ body {
 .cmt-item {
   display: flex;
   gap: 8px;
-  align-items: baseline;
   font-size: 0.825rem;
 }
 
-.cmt-author {
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.cmt-body {
-  flex: 1;
-  color: var(--text-sub);
-}
-
-.cmt-time {
-  font-size: 0.725rem;
-  color: var(--text-sub);
-  opacity: 0.6;
-}
+.cmt-author { font-weight: 700; }
+.cmt-body { flex: 1; color: var(--text-sub); }
+.cmt-time { font-size: 0.725rem; opacity: 0.6; }
 
 .cmt-input-row {
   display: flex;
   gap: 8px;
-  margin-top: 4px;
 }
 
 .sub-input {
@@ -326,7 +294,6 @@ body {
   color: var(--text-main);
   padding: 6px 10px;
   font-size: 0.8rem;
-  outline: none;
 }
 
 .sub-input.name { width: 80px; }
@@ -337,18 +304,9 @@ body {
   border: none;
   color: var(--text-main);
   font-weight: 700;
-  font-size: 0.8rem;
   cursor: pointer;
 }
 
-.feed-status {
-  text-align: center;
-  padding: 32px 0;
-  color: var(--text-sub);
-  font-size: 0.875rem;
-}
-
-/* Floating Write Button */
 .floating-write-btn {
   position: fixed;
   bottom: 28px;
@@ -362,17 +320,9 @@ body {
   align-items: center;
   gap: 8px;
   font-weight: 700;
-  font-size: 0.9rem;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transition: transform 0.15s ease;
 }
 
-.floating-write-btn:hover {
-  transform: scale(1.05);
-}
-
-/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -382,10 +332,9 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  padding: 16px;
 }
 
-.modal-content {
+.modal-content-feed {
   background: var(--card-bg);
   width: 100%;
   max-width: 440px;
@@ -400,19 +349,6 @@ body {
   margin-bottom: 20px;
 }
 
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text-sub);
-  font-size: 1rem;
-  cursor: pointer;
-}
-
 .modal-form {
   display: flex;
   flex-direction: column;
@@ -425,8 +361,6 @@ body {
   background: transparent;
   color: var(--text-main);
   padding: 8px 0;
-  font-size: 0.95rem;
-  outline: none;
 }
 
 .color-selector {
@@ -435,15 +369,7 @@ body {
   gap: 12px;
 }
 
-.c-label {
-  font-size: 0.8rem;
-  color: var(--text-sub);
-}
-
-.c-dots {
-  display: flex;
-  gap: 8px;
-}
+.c-dots { display: flex; gap: 8px; }
 
 .c-dot {
   width: 18px;
@@ -451,12 +377,9 @@ body {
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  transition: transform 0.1s;
 }
 
-.c-dot.selected {
-  transform: scale(1.3);
-}
+.c-dot.selected { transform: scale(1.3); }
 
 .minimal-textarea {
   border: 1px solid var(--line-color);
@@ -465,15 +388,7 @@ body {
   color: var(--text-main);
   padding: 12px;
   height: 110px;
-  font-size: 0.95rem;
   resize: none;
-  outline: none;
-}
-
-.modal-error {
-  color: #ef4444;
-  font-size: 0.8rem;
-  margin: 0;
 }
 
 .modal-submit-btn {
@@ -483,6 +398,314 @@ body {
   padding: 12px;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 0.9rem;
   cursor: pointer;
 }
+
+/* ==================== 3. 피자 모드 변수 & 스타일 ==================== */
+.mode-pizza {
+  --bg: #f8f6f0; 
+  --surface: #ffffff;
+  --text: #1a0f08;
+  --muted: #5c4d43;
+  --border: #2c1a10; 
+  --btn-bg: #ffc000; 
+  --btn-text: #1a0f08;
+  --pizza-crust: #d35400;
+  --pizza-cheese: #fff3cd;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+[data-theme='dark'] .mode-pizza {
+  --bg: #18100b;
+  --surface: #2c1d15;
+  --text: #ffffff; 
+  --muted: #bdaea4;
+  --border: #ffffff;
+  --btn-bg: #e67e22;
+  --btn-text: #ffffff;
+  --pizza-crust: #a04000;
+  --pizza-cheese: #3d271a;
+}
+
+.mode-pizza * { box-sizing: border-box; }
+
+.app-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+}
+
+.main-header, .composer-box, .filter-toolbar, .stat-box {
+  width: 100%;
+  max-width: 850px;
+  background: var(--surface);
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 4px 4px 0 var(--border);
+}
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+  background: #e74c3c;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 8px;
+  border: 2px solid var(--border);
+}
+
+.main-header h1 { margin: 0 0 4px; font-size: 1.8rem; font-weight: 900; }
+.subtitle { margin: 0; font-size: 0.95rem; color: var(--muted); font-weight: 500; }
+
+.toggle-btn, .submit-btn-pizza, .c-submit-btn, .search-btn, .modal-close-btn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 800; 
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submit-btn-pizza { background: #e74c3c; color: white; font-size: 1.05rem; padding: 14px; width: 100%; margin-top: 6px; }
+.search-btn { background: var(--border); color: var(--surface); }
+
+.stats-container {
+  width: 100%;
+  max-width: 850px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.stat-box { text-align: center; padding: 18px; }
+.stat-val { display: block; font-size: 1.8rem; font-weight: 900; color: #e67e22; }
+.stat-lbl { font-size: 0.9rem; font-weight: 700; color: var(--muted); }
+
+.composer-trigger { display: flex; justify-content: space-between; align-items: center; }
+.composer-form { margin-top: 18px; border-top: 2px dashed var(--border); padding-top: 18px; display: flex; flex-direction: column; gap: 14px; }
+.input-group { display: flex; gap: 12px; }
+
+.mode-pizza input, .mode-pizza select, .mode-pizza textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  outline: none;
+}
+.mode-pizza textarea { height: 110px; resize: none; }
+
+.filter-toolbar { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.search-form { display: flex; gap: 8px; flex: 1; }
+.search-form input { max-width: 280px; }
+.filter-toolbar select { max-width: 180px; }
+
+/* 🍕 피자 판 스타일 */
+.pizza-table-center {
+  width: 100%;
+  max-width: 850px;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.giant-pizza-dough {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+  background: var(--pizza-cheese);
+  border: 30px solid var(--pizza-crust);
+  border-radius: 100px; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+  padding: 50px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  align-content: flex-start;
+}
+
+.topping-slice {
+  width: 230px; 
+  min-height: 180px;
+  height: auto; 
+  border: 3px solid #1a0f08; 
+  box-shadow: 4px 4px 0 #1a0f08;
+  padding: 22px 20px 18px 20px; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  cursor: pointer;
+  background-color: var(--topping-color);
+}
+
+.shape-pepperoni { border-radius: 40px; } 
+.shape-cheddar { border-radius: 16px; } 
+.shape-sweetpotato { border-radius: 60px 20px 60px 20px; } 
+.shape-bellpepper { border-radius: 20px 60px 20px 60px; } 
+.shape-onion { border-radius: 40px 40px 16px 16px; } 
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed rgba(44, 26, 16, 0.4);
+  padding-bottom: 8px;
+}
+
+.topping-slice .author-name { 
+  font-weight: 900; 
+  font-size: 0.95rem; 
+  color: #1a0f08 !important; 
+}
+
+.topping-slice .time-stamp { 
+  font-size: 0.75rem; 
+  font-weight: 800; 
+  color: #4a3525 !important; 
+}
+
+.topping-slice .card-content {
+  margin: 0;
+  font-size: 0.95rem; 
+  font-weight: 800; 
+  color: #1a0f08 !important;
+  word-break: break-all;
+  white-space: pre-wrap; 
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed rgba(44, 26, 16, 0.3);
+  padding-top: 8px;
+}
+
+.like-action {
+  background: #ffffff;
+  color: #1a0f08 !important;
+  border: 2px solid #1a0f08;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+}
+
+.like-action.liked { background: #e74c3c; color: #ffffff !important; }
+
+.comment-count-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #1a0f08 !important;
+  background: rgba(255,255,255,0.6);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.delete-topping-btn {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  background: #ffffff;
+  border: 2px solid #1a0f08;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pizza-comment-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 15, 8, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--surface);
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+  box-shadow: 6px 6px 0 var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.modal-header-row { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  border-bottom: 2px solid var(--border); 
+  padding-bottom: 12px; 
+}
+
+.modal-body-story {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-weight: 800;
+}
+
+.comment-flow {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.topping-crumb {
+  background: var(--bg);
+  border-left: 4px solid #e67e22;
+  border-radius: 4px;
+  padding: 10px 14px;
+}
+
+.comment-form-row { 
+  display: flex; 
+  gap: 8px; 
+  align-items: center; 
+}
+
+.comment-form-row input.c-name-input { flex: 3; }
+.comment-form-row input.c-content-input { flex: 6; }
