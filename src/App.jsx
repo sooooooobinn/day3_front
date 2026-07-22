@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import './App.css'
 
@@ -90,7 +89,7 @@ function App() {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
   }, [darkMode])
 
-  // 초기 로컬 스토리지 데이터 마이그레이션 백업 로드
+  // 초기 로컬 스토리지 데이터 로드
   useEffect(() => {
     const storedMessages = window.localStorage.getItem(STORAGE_KEY)
     const storedStats = window.localStorage.getItem(STATS_KEY)
@@ -189,7 +188,6 @@ function App() {
     }
     setError('')
 
-    // 낙관적 업데이트 인스턴스 생성
     const optimisticMessage = normalizeMessage({
       id: `temp-${Date.now()}`,
       name: name.trim(),
@@ -237,27 +235,38 @@ function App() {
     }
   }
 
-  // 좋아요 요청 처리 (중복 클릭 방어 포함)
-  const handleLike = async (messageId) => {
+  // 좋아요 토글 처리 (좋아요 추가 ↔ 좋아요 취소)
+  const handleToggleLike = async (messageId) => {
     const target = messages.find((m) => m.id === messageId)
-    if (!target || target.likedByMe) return // 백엔드가 누적 증가만 지원하므로 프론트에서 중복클릭 락 처리
+    if (!target) return
+
+    const isCancel = target.likedByMe
+    const nextLikes = isCancel ? Math.max(0, target.likes - 1) : target.likes + 1
 
     const backupMessages = [...messages]
+
+    // 프론트엔드 즉시 반영
     setMessages((prev) => {
       const updated = prev.map((m) =>
-        m.id === messageId ? { ...m, likes: m.likes + 1, likedByMe: true } : m
+        m.id === messageId ? { ...m, likes: nextLikes, likedByMe: !isCancel } : m
       )
       persistMessages(updated)
       return updated
     })
 
     try {
-      const res = await fetch(`${API_URL}/messages/${messageId}/like`, { method: 'PATCH' })
+      const endpoint = `${API_URL}/messages/${messageId}/like`
+      const method = isCancel ? 'DELETE' : 'PATCH'
+
+      const res = await fetch(endpoint, { method })
       const text = await res.text()
+
       if (res.ok && text.trim()) {
-        const data = JSON.parse(text) // { likes: X } 형태로 반환됨
+        const data = JSON.parse(text)
         setMessages((prev) => {
-          const sync = prev.map((m) => (m.id === messageId ? { ...m, likes: Number(data.likes ?? m.likes) } : m))
+          const sync = prev.map((m) =>
+            m.id === messageId ? { ...m, likes: Number(data.likes ?? m.likes) } : m
+          )
           persistMessages(sync)
           return sync
         })
@@ -333,7 +342,6 @@ function App() {
     }
   }
 
-  // 메모이제이션 필터 스케줄러 (무한스크롤 스냅샷 동기화)
   const visibleMessages = useMemo(() => {
     return [...messages]
   }, [messages])
@@ -426,8 +434,7 @@ function App() {
             <div className="card-footer">
               <button 
                 className={`like-action ${msg.likedByMe ? 'liked' : ''}`} 
-                onClick={() => handleLike(msg.id)}
-                disabled={msg.likedByMe}
+                onClick={() => handleToggleLike(msg.id)}
               >
                 {msg.likedByMe ? '❤️' : '🤍'} <span>{msg.likes}</span>
               </button>
