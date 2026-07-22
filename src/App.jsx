@@ -11,9 +11,9 @@ const CARD_THEMES = [
   { value: '#ffeaa7', idName: 'sweetpotato', label: '고구마 무스 골드', icon: '🍠' },
   { value: '#55efc4', idName: 'bellpepper', label: '올리브 피망 그린', icon: '🫑' },
   { value: '#a29bfe', idName: 'onion', label: '적양파 퍼플', icon: '🧅' },
-  { value: '#bfdbfe', idName: 'bluecheese', label: '블루 치즈', icon: '🧀' }, 
+  { value: '#74b9ff', idName: 'bluecheese', label: '블루 치즈', icon: '🧀' },
 ]
-const BAD_WORDS = ['바보', '멍청이', '쓰레기', '시발', '존나', '개새끼']
+const BAD_WORDS = ['바보', '멍청이', '쓰레기', '시발', '존나', '개새끼', '병신', '닥쳐', '꺼져', '좆같다', 'ㅅㅂ', 'ㅈㄹ', 'ㅂㅅ', 'ㅄ']
 const filterBadWords = (text) => {
   let filtered = text
   BAD_WORDS.forEach((word) => {

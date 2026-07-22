@@ -563,6 +563,7 @@
   background-color: var(--topping-color);
 }
 
+/* App.css 내 토핑 셰이프 정의 부분 */
 .shape-pepperoni { border-radius: 40px; } 
 .shape-cheddar { border-radius: 16px; } 
 .shape-sweetpotato { border-radius: 60px 20px 60px 20px; } 
