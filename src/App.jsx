@@ -6,11 +6,11 @@ const STORAGE_KEY = 'guestbook-messages-v4'
 const STATS_KEY = 'guestbook-stats-v4'
 
 const CARD_THEMES = [
-  { value: '#fef08a', label: '노랑' },
-  { value: '#bfdbfe', label: '파랑' },
-  { value: '#fbcfe8', label: '분홍' },
-  { value: '#bbf7d0', label: '초록' },
-  { value: '#e9d5ff', label: '보라' },
+  { value: '#fff9c4', label: '노랑', bgClass: 'theme-yellow' },
+  { value: '#e3f2fd', label: '파랑', bgClass: 'theme-blue' },
+  { value: '#fce4ec', label: '분홍', bgClass: 'theme-pink' },
+  { value: '#e8f5e9', label: '초록', bgClass: 'theme-green' },
+  { value: '#f3e5f5', label: '보라', bgClass: 'theme-purple' },
 ]
 
 const normalizeMessage = (msg, index) => ({
@@ -19,7 +19,7 @@ const normalizeMessage = (msg, index) => ({
   content: msg.content ?? '',
   likes: Number(msg.likes ?? 0),
   likedByMe: Boolean(msg.likedByMe),
-  theme: msg.theme ?? '#fef08a',
+  theme: msg.theme ?? '#fff9c4',
   createdAt: msg.createdAt ?? new Date().toISOString(),
   comments: Array.isArray(msg.comments)
     ? msg.comments.map((c, cIdx) => ({
@@ -64,7 +64,7 @@ function App() {
   
   const [name, setName] = useState('')
   const [content, setContent] = useState('')
-  const [theme, setTheme] = useState('#fef08a')
+  const [theme, setTheme] = useState('#fff9c4')
   
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
@@ -76,7 +76,7 @@ function App() {
   
   const [commentNames, setCommentNames] = useState({})
   const [commentContents, setCommentContents] = useState({})
-  const [openComments, setOpenComments] = useState({}) // 댓글 열림/닫힘 상태
+  const [expandedComments, setExpandedComments] = useState({})
   
   const [error, setError] = useState('')
   const [darkMode, setDarkMode] = useState(false)
@@ -181,7 +181,7 @@ function App() {
   const handleSubmit = async (event) => {
     event.preventDefault()
     if (!name.trim() || !content.trim()) {
-      setError('이름과 내용을 모두 입력해 주세요.')
+      setError('이름과 내용을 입력해주세요.')
       return
     }
     setError('')
@@ -234,7 +234,7 @@ function App() {
   }
 
   const handleDeleteMessage = async (messageId) => {
-    if (!window.confirm('이 포스트잇을 삭제하시겠습니까?')) return
+    if (!window.confirm('이 방명록을 삭제하시겠습니까?')) return
 
     const backupMessages = [...messages]
     
@@ -251,7 +251,7 @@ function App() {
 
       if (!res.ok) {
         setMessages(backupMessages)
-        alert('게시글 삭제에 실패했습니다. (새로고침 후 시도해보세요)')
+        alert('게시글 삭제에 실패했습니다.')
       } else {
         fetchStats()
       }
@@ -303,8 +303,8 @@ function App() {
     }
   }
 
-  const toggleCommentAccordion = (id) => {
-    setOpenComments((prev) => ({ ...prev, [id]: !prev[id] }))
+  const toggleComments = (id) => {
+    setExpandedComments((prev) => ({ ...prev, [id]: !prev[id] }))
   }
 
   const handleAddComment = async (messageId) => {
@@ -312,7 +312,7 @@ function App() {
     const cContent = commentContents[messageId]?.trim() || ''
 
     if (!cName || !cContent) {
-      alert('닉네임과 댓글 내용을 작성해 주세요.')
+      alert('닉네임과 댓글 내용을 작성해주세요.')
       return
     }
 
@@ -373,62 +373,73 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* 1. 상단 헤더 영역 */}
+      {/* 대시보드 헤더 */}
       <header className="main-header">
-        <div className="header-title">
-          <span className="badge">💌 MINI GUESTBOOK</span>
-          <h1>한 줄 방명록 보드</h1>
-          <p className="subtitle">소중한 의견과 인사를 자유롭게 포스트잇으로 남겨주세요.</p>
+        <div className="header-left">
+          <span className="badge">💌 GUESTBOOK DASHBOARD</span>
+          <h1>방명록 대시보드</h1>
+          <p className="subtitle">자유롭게 메시지를 남기고 사람들과 이야기를 나눠보세요.</p>
         </div>
         <button className="theme-toggle-btn" onClick={() => setDarkMode(!darkMode)}>
-          {darkMode ? '☀️ 라이트 모드' : '🌙 다크 모드'}
+          {darkMode ? '☀️ Light' : '🌙 Dark'}
         </button>
       </header>
 
-      {/* 2. 대시보드 통계 카드 */}
+      {/* 모던 대시보드 통계 카드 */}
       <section className="stats-container">
         <div className="stat-card">
-          <span className="stat-label">📌 전체 방명록</span>
-          <span className="stat-value">{stats.total_messages}개</span>
+          <div className="stat-icon purple">📌</div>
+          <div className="stat-info">
+            <span className="stat-val">{stats.total_messages}</span>
+            <span className="stat-lbl">누적 방명록</span>
+          </div>
         </div>
         <div className="stat-card">
-          <span className="stat-label">✨ 오늘 등록된 글</span>
-          <span className="stat-value">{stats.messages_today}개</span>
+          <div className="stat-icon orange">✨</div>
+          <div className="stat-info">
+            <span className="stat-val">{stats.messages_today}</span>
+            <span className="stat-lbl">오늘 올라온 글</span>
+          </div>
         </div>
         <div className="stat-card">
-          <span className="stat-label">💬 누적 댓글</span>
-          <span className="stat-value">{stats.total_comments}개</span>
+          <div className="stat-icon blue">💬</div>
+          <div className="stat-info">
+            <span className="stat-val">{stats.total_comments}</span>
+            <span className="stat-lbl">누적 댓글 수</span>
+          </div>
         </div>
       </section>
 
-      {/* 3. 새 포스트잇 작성 영역 (접기/펼치기) */}
-      <section className="composer-wrapper">
-        <button 
-          className={`composer-toggle-bar ${showComposer ? 'active' : ''}`}
-          onClick={() => setShowComposer(!showComposer)}
-        >
-          <span>✍️ 새 포스트잇 작성하기</span>
-          <span className="arrow-icon">{showComposer ? '▲' : '▼'}</span>
-        </button>
+      {/* 작성기 컴포넌트 */}
+      <section className="composer-card">
+        <div className="composer-header">
+          <div className="composer-title">
+            <span className="icon">✍️</span>
+            <strong>새 방명록 남기기</strong>
+          </div>
+          <button className="toggle-btn" onClick={() => setShowComposer(!showComposer)}>
+            {showComposer ? '접기' : '작성하기'}
+          </button>
+        </div>
 
         {showComposer && (
           <form onSubmit={handleSubmit} className="composer-form">
             <div className="form-row">
-              <input 
-                className="input-field"
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                placeholder="작성자 닉네임" 
-                maxLength={50} 
+              <input
+                className="modern-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="작성자 닉네임"
+                maxLength={50}
               />
-              <div className="theme-selector">
-                <label>색상 선택:</label>
-                <div className="color-options">
+              <div className="color-palette">
+                <span className="palette-label">테마 색상</span>
+                <div className="color-chips">
                   {CARD_THEMES.map((t) => (
                     <button
                       key={t.value}
                       type="button"
-                      className={`color-btn ${theme === t.value ? 'selected' : ''}`}
+                      className={`color-chip ${theme === t.value ? 'active' : ''}`}
                       style={{ backgroundColor: t.value }}
                       onClick={() => setTheme(t.value)}
                       title={t.label}
@@ -437,127 +448,125 @@ function App() {
                 </div>
               </div>
             </div>
+
             <textarea
-              className="textarea-field"
+              className="modern-textarea"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="따뜻한 한마디를 남겨주세요 (최대 500자, 부적절한 언어는 자동으로 필터링됩니다)"
+              placeholder="내용을 채워주세요 (최대 500자, 욕설 및 비속어는 자동으로 필터링됩니다.)"
               maxLength={500}
             />
-            {error && <p className="error-text">⚠️ {error}</p>}
-            <button type="submit" className="primary-submit-btn">보드에 부착하기 📌</button>
+
+            {error && <p className="error-msg">⚠️ {error}</p>}
+
+            <button type="submit" className="submit-action-btn">
+              보드에 등록하기
+            </button>
           </form>
         )}
       </section>
 
-      {/* 4. 검색 & 정렬 툴바 */}
-      <section className="toolbar-container">
-        <form className="search-box" onSubmit={handleSearchSubmit}>
-          <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
+      {/* 검색 & 필터 바 */}
+      <section className="toolbar">
+        <form className="search-form" onSubmit={handleSearchSubmit}>
+          <span className="search-icon">🔍</span>
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="이름 또는 내용 검색..."
+            placeholder="이름 또는 키워드로 검색..."
           />
-          <button type="submit" className="search-action-btn">검색</button>
+          <button type="submit" className="search-btn">검색</button>
         </form>
 
-        <div className="sort-dropdown">
-          <select value={sortMode} onChange={(e) => setSortMode(e.target.value)}>
-            <option value="latest">⏰ 최신순 보기</option>
-            <option value="likes">🔥 인기순 보기</option>
-          </select>
-        </div>
+        <select className="sort-select" value={sortMode} onChange={(e) => setSortMode(e.target.value)}>
+          <option value="latest">⏰ 최신순</option>
+          <option value="likes">🔥 인기순</option>
+        </select>
       </section>
 
-      {/* 5. 방명록 포스트잇 카드 그리드 */}
+      {/* 방명록 카드 그리드 */}
       <main className="grid-layout">
         {visibleMessages.map((msg) => {
-          const isCmtOpen = Boolean(openComments[msg.id])
+          const isExpanded = Boolean(expandedComments[msg.id])
 
           return (
             <article key={msg.id} className="post-card" style={{ '--card-bg': msg.theme }}>
-              {/* 카드 상단: 작성자 및 삭제 버튼 */}
+              {/* 헤더 */}
               <div className="card-header">
-                <div className="author-info">
-                  <span className="author-avatar">👤</span>
+                <div className="user-profile">
+                  <div className="avatar">👤</div>
                   <span className="author-name">{msg.name}</span>
                 </div>
-                <div className="header-right">
+                
+                <div className="header-meta">
                   <span className="time-stamp">{formatRelativeTime(msg.createdAt)}</span>
-                  {/* UX 개선된 SVG 삭제 버튼 */}
-                  <button 
-                    className="delete-icon-btn" 
+                  {/* 깔끔한 SVG 삭제 버튼 */}
+                  <button
+                    className="delete-btn"
                     onClick={() => handleDeleteMessage(msg.id)}
-                    title="이 포스트잇 삭제하기"
+                    title="방명록 삭제"
                     aria-label="삭제"
                   >
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 6h18"></path>
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
                     </svg>
-                    <span>삭제</span>
                   </button>
                 </div>
               </div>
 
-              {/* 카드 본문 */}
-              <div className="card-body">
+              {/* 본문 */}
+              <div className="card-main">
                 <p className="card-content">{msg.content}</p>
               </div>
 
-              {/* 카드 액션 바 */}
-              <div className="card-actions">
-                <button 
-                  className={`like-btn ${msg.likedByMe ? 'liked' : ''}`} 
+              {/* 푸터 액션 */}
+              <div className="card-footer">
+                <button
+                  className={`like-pill ${msg.likedByMe ? 'liked' : ''}`}
                   onClick={() => handleToggleLike(msg.id)}
                 >
-                  <span className="heart-icon">{msg.likedByMe ? '❤️' : '🤍'}</span>
-                  <span className="like-count">{msg.likes}</span>
+                  <span className="heart">{msg.likedByMe ? '❤️' : '🤍'}</span>
+                  <span className="count">{msg.likes}</span>
                 </button>
 
-                <button 
-                  className="comment-toggle-btn" 
-                  onClick={() => toggleCommentAccordion(msg.id)}
-                >
-                  💬 댓글 <strong>{msg.commentCount}</strong>개 {isCmtOpen ? '▲' : '▼'}
+                <button className="cmt-toggle-btn" onClick={() => toggleComments(msg.id)}>
+                  💬 댓글 <strong>{msg.commentCount}</strong> {isExpanded ? '▲' : '▼'}
                 </button>
               </div>
 
-              {/* 댓글 접기/펼치기 아코디언 */}
-              {isCmtOpen && (
-                <div className="comment-accordion">
+              {/* 댓글 아코디언 */}
+              {isExpanded && (
+                <div className="comment-drawer">
                   {msg.comments && msg.comments.length > 0 && (
                     <ul className="comment-list">
                       {msg.comments.map((cmt) => (
-                        <li key={cmt.id} className="comment-item">
-                          <div className="cmt-header">
+                        <li key={cmt.id} className="comment-bubble">
+                          <div className="cmt-meta">
                             <span className="cmt-user">@{cmt.name}</span>
-                            <span className="cmt-date">{formatRelativeTime(cmt.createdAt)}</span>
+                            <span className="cmt-time">{formatRelativeTime(cmt.createdAt)}</span>
                           </div>
-                          <p className="cmt-body">{cmt.content}</p>
+                          <p className="cmt-text">{cmt.content}</p>
                         </li>
                       ))}
                     </ul>
                   )}
 
-                  <div className="comment-input-group">
+                  <div className="comment-form-row">
                     <input
-                      className="cmt-name-input"
+                      className="c-input name"
                       value={commentNames[msg.id] || ''}
                       onChange={(e) => setCommentNames({ ...commentNames, [msg.id]: e.target.value })}
                       placeholder="닉네임"
                       maxLength={30}
                     />
                     <input
-                      className="cmt-text-input"
+                      className="c-input text"
                       value={commentContents[msg.id] || ''}
                       onChange={(e) => setCommentContents({ ...commentContents, [msg.id]: e.target.value })}
-                      placeholder="댓글을 남겨보세요..."
-                      maxLength={200}
+                      placeholder="댓글 입력..."
+                      maxLength={300}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault()
@@ -565,7 +574,9 @@ function App() {
                         }
                       }}
                     />
-                    <button className="cmt-send-btn" onClick={() => handleAddComment(msg.id)}>작성</button>
+                    <button className="c-send-btn" onClick={() => handleAddComment(msg.id)}>
+                      등록
+                    </button>
                   </div>
                 </div>
               )}
@@ -573,9 +584,9 @@ function App() {
           )
         })}
 
-        {loading && <div className="status-indicator">🔄 방명록 동기화 중...</div>}
+        {loading && <div className="status-indicator">⚡ 데이터를 새로고침하고 있습니다...</div>}
         {!loading && visibleMessages.length === 0 && (
-          <div className="status-indicator empty">등록된 방명록이 없습니다. 첫 번째 포스트잇을 적어보세요!</div>
+          <div className="status-indicator">검색된 방명록이 없습니다. 첫 포스트잇을 남겨보세요!</div>
         )}
         <div ref={sentinelRef} className="scroll-sentinel" />
       </main>
