@@ -343,8 +343,8 @@ function App() {
       <header className="main-header">
         <div>
           <span className="badge">💌 GUESTBOOK</span>
-          <h1>스퀘어 무드 보드</h1>
-          <p className="subtitle">소중한 의견을 포스트잇 스퀘어 형태로 자유롭게 남겨보세요.</p>
+          <h1>방명록</h1>
+          <p className="subtitle">방명록을 자유롭게 남겨보세요.</p>
         </div>
         <button className="theme-btn" onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
