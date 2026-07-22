@@ -13,7 +13,7 @@ const CARD_THEMES = [
   { value: '#e9d5ff', label: '보라' },
 ]
 
-// 백엔드 응답 규격 데이터 방어 정규화 함수
+// 백엔드 응답 데이터 규격 정규화 함수
 const normalizeMessage = (msg, index) => ({
   id: msg.id ?? `local-${index}-${Date.now()}`,
   name: msg.name ?? '익명',
@@ -89,7 +89,7 @@ function App() {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
   }, [darkMode])
 
-  // 초기 로컬 스토리지 데이터 로드
+  // 로컬 스토리지 마이그레이션 백업 로드
   useEffect(() => {
     const storedMessages = window.localStorage.getItem(STORAGE_KEY)
     const storedStats = window.localStorage.getItem(STATS_KEY)
@@ -235,7 +235,37 @@ function App() {
     }
   }
 
-  // 좋아요 토글 처리 (좋아요 추가 ↔ 좋아요 취소)
+  // 게시글 삭제 처리
+  const handleDeleteMessage = async (messageId) => {
+    if (!window.confirm('정말로 이 포스트잇을 삭제하시겠습니까?')) return
+
+    const backupMessages = [...messages]
+    
+    // 즉시 UI 반영 (낙관적 업데이트)
+    setMessages((prev) => {
+      const updated = prev.filter((m) => m.id !== messageId)
+      persistMessages(updated)
+      return updated
+    })
+
+    try {
+      const res = await fetch(`${API_URL}/messages/${messageId}`, {
+        method: 'DELETE',
+      })
+
+      if (!res.ok) {
+        setMessages(backupMessages) // 실패 시 원복
+        alert('게시글 삭제에 실패했습니다.')
+      } else {
+        fetchStats()
+      }
+    } catch (err) {
+      setMessages(backupMessages)
+      alert('네트워크 오류로 삭제 실패했습니다.')
+    }
+  }
+
+  // 좋아요 토글 처리 (추가 ↔ 취소)
   const handleToggleLike = async (messageId) => {
     const target = messages.find((m) => m.id === messageId)
     if (!target) return
@@ -245,7 +275,6 @@ function App() {
 
     const backupMessages = [...messages]
 
-    // 프론트엔드 즉시 반영
     setMessages((prev) => {
       const updated = prev.map((m) =>
         m.id === messageId ? { ...m, likes: nextLikes, likedByMe: !isCancel } : m
@@ -424,7 +453,16 @@ function App() {
           <article key={msg.id} className="post-card" style={{ '--card-bg': msg.theme }}>
             <div className="card-header">
               <span className="author-name">👤 {msg.name}</span>
-              <span className="time-stamp">{formatRelativeTime(msg.createdAt)}</span>
+              <div className="header-actions">
+                <span className="time-stamp">{formatRelativeTime(msg.createdAt)}</span>
+                <button 
+                  className="card-delete-btn" 
+                  onClick={() => handleDeleteMessage(msg.id)}
+                  title="포스트잇 삭제"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
 
             <div className="card-main">
