@@ -568,6 +568,7 @@
 .shape-sweetpotato { border-radius: 60px 20px 60px 20px; } 
 .shape-bellpepper { border-radius: 20px 60px 20px 60px; } 
 .shape-onion { border-radius: 40px 40px 16px 16px; } 
+.shape-bluecheese { border-radius: 25px 50px 25px 50px; }
 
 .card-header {
   display: flex;
